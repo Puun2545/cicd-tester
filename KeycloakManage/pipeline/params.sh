@@ -23,6 +23,11 @@ GROUP_NAME [group-name] -> ประกอบด้วย
 - PROJECT_NAME [project-name]
 - USER_ROLE [role-name] -> จะต้องไป MAP กับ Role ใน Keycloak ต่่อ
 
+# Manage Role
+ROLE_NAME [role-name]
+ROLE_DESCRIPTION [role-description]
+
+
 # Manage Client
 CLIENT_NAME [client-name]
 CLIENT_REDIRECT_URI [client-redirect-uri]
