@@ -3,7 +3,7 @@ pipeline {
 
     parameters {
         string(name: 'CRON', defaultValue: '0 0 * * 1-7', description: 'Cron string to compare')
-        string(name: 'JOB_DES_PATH', defaultValue: 'project-a/stop/stop-instance', description: 'Destination job path to compare')
+        string(name: 'JOB_DES_PATH', defaultValue: 'project-a/stop/stop-instance', description: 'Destination job full path to compare')
     }
 
     stages {
@@ -15,15 +15,19 @@ pipeline {
 
                     // Get the destination job's cron configuration
                     def destJob = Jenkins.instance.getItemByFullName(jobName)
+
+                    // Check if the destination job exists
                     if (destJob == null) {
                         error "Destination job not found: ${jobName}"
                     } else {
                         echo "Destination job found: ${jobName}"
                     }
 
+                    // Get the triggers of the destination job
                     def triggers = destJob.getTriggers()
                     echo "Triggers found: ${triggers.size()}"
 
+                    // Get the cron configuration of the destination job
                     def cronConfig = ''
                     triggers.each { trigger, descriptor ->
                         echo "Trigger class: ${trigger.getClass()}, Descriptor: ${descriptor.getClass()}"
