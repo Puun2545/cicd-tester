@@ -1,6 +1,11 @@
 pipeline {
     agent any
 
+    parameter {
+        string(name: 'USER_NAME', defaultValue: 'user1', description: 'User name to reset password')
+        string(name: 'NEW_PASSWORD', defaultValue: 'password', description: 'New password for the user')
+    }
+
     environment {
         KEYCLOAK_SERVER = "172.17.0.3:8800"
         REALM = "test-realms"
@@ -37,7 +42,11 @@ pipeline {
                     """, returnStdout: true).trim()
 
                     def users = new groovy.json.JsonSlurper().parseText(response)
-                    env.USER_ID = users.find { it.username == 'user1' }.id
+                    env.USER_ID = users.find { it.username == "${params.USER_NAME}" }.id
+
+                    if (env.USER_ID == null) {
+                        error("User not found")
+                    }
                 }
             }
         }
@@ -48,7 +57,7 @@ pipeline {
                     curl -X PUT -k -s \
                     -H "Content-Type: application/json" \
                     -H "Authorization: Bearer ${env.ACCESS_TOKEN}" \
-                    -d '{"type":"password","value":"password"}' \
+                    -d '{"type":"password","value":"${params.NEW_PASSWORD}"}' \
                     "${KEYCLOAK_SERVER}/admin/realms/${REALM}/users/${USER_ID}/reset-password"
                 """)
             }

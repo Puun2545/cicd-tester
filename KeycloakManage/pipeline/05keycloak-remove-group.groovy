@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    parameters {
+        string(name: 'GROUP_NAME', defaultValue: 'testgroup1', description: 'Name of the group to delete')
+    }
+
     environment {
         KEYCLOAK_SERVER = "172.17.0.3:8080"
         REALM = "test-realms"
@@ -37,7 +41,11 @@ pipeline {
                     """, returnStdout: true).trim()
 
                     def groups = new groovy.json.JsonSlurper().parseText(response)
-                    env.GROUP_ID = groups.find { it.name == 'testgroup1' }.id
+                    env.GROUP_ID = groups.find { it.name == "${params.GROUP_NAME}" }.id
+
+                    if (env.GROUP_ID == null) {
+                        error("Group not found")
+                    }
                 }
             }
         }

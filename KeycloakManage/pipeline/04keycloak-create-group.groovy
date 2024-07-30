@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    parameter {
+        string(name: 'GROUP_NAME', defaultValue: 'testgroup1', description: 'Group name to create')
+    }
+
     environment {
         KEYCLOAK_SERVER = "172.17.0.3:8080"
         REALM = "test-realms"
@@ -37,7 +41,7 @@ pipeline {
                     """, returnStdout: true).trim()
 
                     def groups = new groovy.json.JsonSlurper().parseText(response)
-                    def group = groups.find { it.name == 'testgroup1' }
+                    def group = groups.find { it.name == "${params.GROUP_NAME}" }
                     if (group) {
                         env.GROUP_ID = group.id
                     }
@@ -56,7 +60,7 @@ pipeline {
                             -H "Content-Type: application/json" \
                             -H "Authorization: Bearer ${env.ACCESS_TOKEN}" \
                             -d '{
-                                "name": "testgroup1",
+                                "name": "${params.GROUP_NAME}",
                                 "attributes": {}
                             }' \
                             "${KEYCLOAK_SERVER}/admin/realms/${REALM}/groups"

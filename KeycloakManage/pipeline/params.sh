@@ -33,3 +33,20 @@ CLIENT_NAME [client-name]
 CLIENT_REDIRECT_URI [client-redirect-uri]
 CLIENT_SECRET [client-secret]
 
+
+# Req API to Jenkins
+curl -X POST "http://localhost:8080/job/keycloak/job/keycloak-api/job/keycloak-add-user/buildWithParameters" \
+--user "admin1:11f8bb24ad8c460929e7078622a9cb895c" \
+--data "USERNAME=userapi1&EMAIL=userapi1@example.com&FIRST_NAME=puun&LAST_NAME=vachiramon&PASSWORD=password" \
+
+
+curl -X POST "http://localhost:8080/job/keycloak/job/keycloak-api/job/keycloak-add-user/buildWithParameters" \
+--user "admin1:11f8bb24ad8c460929e7078622a9cb895c" \
+-H "Content-Type: application/json" \
+--data '{
+    "USERNAME": "userapi1",
+    "EMAIL": "userapi1@example.com",
+    "FIRST_NAME": "puunn",
+    "LAST_NAME": "vachiramonn",
+    "PASSWORD": "password" 
+    }' 

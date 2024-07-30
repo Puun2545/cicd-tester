@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    parameter {
+        string(name: 'USER_NAME', defaultValue: 'user1', description: 'User name to delete')
+    }
+
     environment {
         KEYCLOAK_SERVER = "172.17.0.3:8080"
         REALM = "test-realms"
@@ -26,6 +30,7 @@ pipeline {
             }
         }
 
+        // GOOD TO BE LOOP | GET USER NAME BY LIST
         stage('Get User ID') {
             steps {
                 script {
@@ -37,14 +42,19 @@ pipeline {
                     """, returnStdout: true).trim()
 
                     def users = new groovy.json.JsonSlurper().parseText(response)
-                    env.USER_ID = users.find { it.username == 'user1' }.id
+                    env.USER_ID = users.find { it.username == "${params.USER_NAME}" }.id
+
+                    if (env.USER_ID == null) {
+                        error("User not found")
+                    }
                 }
             }
         }
+
+        // GOOD TO BE LOOP | GET USER ID BY LIST
         stage('Delete User') {
             steps {
                 script {
-
                     sh(script: """
                         curl -X DELETE -k -s \
                         -H "Content-Type: application/json" \

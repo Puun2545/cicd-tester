@@ -1,6 +1,11 @@
 pipeline {
     agent any
 
+    parameter {
+        string(name: 'USER_NAME', defaultValue: 'user1', description: 'User name to remove from group')
+        string(name: 'GROUP_NAME', defaultValue: 'testgroup1', description: 'Group name to remove user from')
+    }
+
     environment {
         KEYCLOAK_SERVER = "172.17.0.3:8080"
         REALM = "test-realms"
@@ -37,7 +42,11 @@ pipeline {
                     """, returnStdout: true).trim()
 
                     def users = new groovy.json.JsonSlurper().parseText(response)
-                    env.USER_ID = users.find { it.username == 'user1' }.id
+                    env.USER_ID = users.find { it.username == "${params.USER_NAME}" }.id
+
+                    if (env.USER_ID == null) {
+                        error("User not found")
+                    }
                 }
             }
         }
@@ -53,7 +62,11 @@ pipeline {
                     """, returnStdout: true).trim()
 
                     def groups = new groovy.json.JsonSlurper().parseText(response)
-                    env.GROUP_ID = groups.find { it.name == 'testgroup1' }.id
+                    env.GROUP_ID = groups.find { it.name == "${params.GROUP_NAME}" }.id
+
+                    if (env.GROUP_ID == null) {
+                        error("Group not found")
+                    }
                 }
             }
         }
